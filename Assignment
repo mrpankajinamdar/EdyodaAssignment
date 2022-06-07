@@ -53,3 +53,35 @@ The work of DS is to ensure a copy of every pod is running on all the nodes.
 
 ----------------------------------------------------------------------------------------------------
 
+Assignment 2
+
+The ROOLING UPDATE is used for deploying a pplication with no downtime.
+In the rolling update,the changed/modified pods are created and the old pods are terminated one by one so there will be no downtime.
+The pods having no change in the new application will be running as it is.
+
+In order to roll update, foolowing code should be added in the yaml file under spec
+
+minReadySeconds: 5
+strategy:
+type: RollingUpdate
+rollingUpdate:
+maxSurge: 1
+maxUnavailable: 1
+
+command for rolling update --> kubectl set image deployment nginx-deployment nginx=nginx:1.14.2 --record
+
+----------------------------------------------------------------------------------------------------
+
+Assignment 3
+
+First we will check if the port is being used by any service using command
+sudo netstat -tulpn | grep LISTEN
+
+If the port is already listening, then we will check whether the services is on ClusterIP or NodePort using command
+kubectl get svc
+
+If there is another service of type NodePort listening on this port, then we should change it to ClusterIP using :- kubectl edit service #servicename
+
+After changing the type of Service then also if it is not working then we delete all the old pods and services and apply the replicaSet.yaml
+so that it will create the services again using
+kubectl apply -f replicaSet.yaml
