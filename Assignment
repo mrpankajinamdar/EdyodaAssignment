@@ -1,0 +1,55 @@
+ASSIGNMENT 4
+-------------
+
+[root@ip-172-31-26-153 ~]# cd /root
+// to download all the files required to deploy the app from github
+[root@ip-172-31-26-153 ~]# git clone https://github.com/ashishrpandey/example-voting-app
+Cloning into 'example-voting-app'...
+remote: Enumerating objects: 494, done.
+remote: Total 494 (delta 0), reused 0 (delta 0), pack-reused 494
+Receiving objects: 100% (494/494), 236.17 KiB | 1.30 MiB/s, done.
+Resolving deltas: 100% (179/179), done.
+
+[root@ip-172-31-26-153 ~]# cd /root/example-voting-app/k8s-specifications
+// to create pods
+[root@ip-172-31-26-153 k8s-specifications]# kubectl apply -f .
+deployment.apps/db created
+service/db created
+deployment.apps/redis created
+service/redis created
+deployment.apps/result created
+service/result created
+deployment.apps/vote created
+service/vote created
+deployment.apps/worker created
+
+//to see the nodeport assigned to voting and result pods
+[root@ip-172-31-26-153 k8s-specifications]# kubectl get svc
+NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+db           ClusterIP   10.100.82.205    <none>        5432/TCP         25s
+kubernetes   ClusterIP   10.96.0.1        <none>        443/TCP          54s
+redis        ClusterIP   10.99.196.225    <none>        6379/TCP         25s
+result       NodePort    10.109.127.125   <none>        5001:31001/TCP   25s
+vote         NodePort    10.103.216.89    <none>        5000:31000/TCP   25s
+
+// to delete a pod
+[root@ip-172-31-26-153 k8s-specifications]# kubectl delete po result-5d57b59f4b-spzcw
+pod "result-5d57b59f4b-spzcw" deleted
+^C
+// when the voting pod was deleted , a new voting pod created and all the previous results also restored
+// when the worker pod was deleted , a new worker pod created but all the data and logs get deleted
+// when the result pod was deleted , a new result pod created and all the previous results also restored
+
+// when the db pod was deleted , a new db pod created but all the previous results were NOT restored
+// This shows data is stateless in kubernetes
+to make the db pod work again one can delete db pod so it will automatically create another db pod 
+
+------------------------------------------------------------------------------------------------------
+
+Assignment 1
+
+RS is used to maintain stable set of pods running at any point of time after deployment.
+The work of DS is to ensure a copy of every pod is running on all the nodes.
+
+----------------------------------------------------------------------------------------------------
+
